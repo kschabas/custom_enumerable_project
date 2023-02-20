@@ -1,18 +1,52 @@
 module Enumerable
   # Your code goes here
   def my_each_with_index
-    for i in 0...self.length do
-      yield(self[i], i)
+    index = 0
+    self.my_each do |i|
+      yield(i, index)
+      index += 1
     end
-    self
   end
 
   def my_select
     result_array = []
-    for i in self do
-      result_array << i if yield(i)
-    end
+    self.my_each { |i| result_array << i if yield i }
     result_array
+  end
+
+  def my_all?
+    result = self.my_each { |i| return false unless yield(i) }
+    return true unless result == false
+  end
+
+  def my_any?
+    result = self.my_each { |i| return true if yield(i) }
+    return false unless result == true
+  end
+
+  def my_none?
+    result = my_each { |i| return false if yield(i) }
+    return true unless result == false
+  end
+
+  def my_count
+    return self.length unless block_given?
+
+    result = 0
+    my_each { |i| result += 1 if yield(i) }
+    result
+  end
+
+  def my_map
+    result_array = []
+    my_each { |i| result_array << yield(i) }
+    result_array
+  end
+
+  def my_inject(initial_value)
+    result = initial_value
+    my_each { |i| result = yield(result, i) }
+    result
   end
 end
 
